@@ -20,6 +20,7 @@
     --radius:12px;
     --max-w:1250px;
     --pad:clamp(1rem,3vw,3rem);
+    --nav-height: 60px; /* Added fixed nav height variable */
 }
 /* ----------  RESET  ---------- */
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -30,6 +31,8 @@ body{
     color:var(--fg);
     line-height:1.6;
     overflow-x: hidden;
+    /* Add padding to account for fixed nav */
+    padding-top: var(--nav-height);
 }
 /* ----------  GLOBAL UTILS  ---------- */
 section{padding:var(--pad) calc(var(--pad)*.8);}
@@ -51,8 +54,21 @@ p{margin-bottom:1em;font-size:clamp(0.95rem, 1.5vw, 1.1rem);color:var(--muted);}
 .btn:hover{transform:translateY(-2px);}
 .grid{display:grid;gap:2.2rem;}
 /* ----------  NAV  ---------- */
-nav{position:fixed;inset:0 0 auto 0;background:rgba(14,17,23,.6);backdrop-filter:blur(8px);z-index:10;}
-nav .wrapper{display:flex;align-items:center;justify-content:space-between;padding:.75rem var(--pad);}
+nav{
+    position:fixed;
+    inset:0 0 auto 0;
+    background:rgba(14,17,23,.9); /* Increased opacity */
+    backdrop-filter:blur(8px);
+    z-index:10;
+    height: var(--nav-height); /* Fixed height */
+}
+nav .wrapper{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:.75rem var(--pad);
+    height: 100%;
+}
 .logo{font-weight:700;font-size:1.25rem;letter-spacing:.5px;}
 nav ul{display:flex;gap:2rem;list-style:none;}
 nav a{color:var(--muted);text-decoration:none;font-weight:500;transition:color .2s;}
@@ -107,7 +123,8 @@ nav a:hover{color:#fff;}
 
 /* ----------  HERO  ---------- */
 .hero{
-    padding-top:calc(var(--pad)*4);
+    /* Adjusted padding to account for fixed nav */
+    padding-top:calc(var(--pad)*2);
     padding-bottom:calc(var(--pad)*4);
     background:
         radial-gradient(1100px 700px at 80% -200px,rgba(var(--primary-rgb),.25) 0%,transparent 70%),
@@ -117,6 +134,12 @@ nav a:hover{color:#fff;}
 }
 .hero p{font-size:clamp(1rem, 2vw, 1.15rem);}
 .hero .btn{margin-top:1.2rem;}
+
+/* Fix for section scroll positioning */
+:target {
+    scroll-margin-top: calc(var(--nav-height) + 20px);
+}
+
 /* ----------  FEATURES  ---------- */
 .feature-card{
     background:var(--bg-alt);
@@ -160,6 +183,10 @@ footer a{color:var(--primary);text-decoration:none;}
 
 /* Added responsive adjustments */
 @media (max-width: 480px) {
+    :root {
+        --nav-height: 50px; /* Slightly smaller nav on mobile */
+    }
+    
     h1 {
         font-size: clamp(1.8rem, 8vw, 2.5rem);
     }
@@ -168,6 +195,11 @@ footer a{color:var(--primary);text-decoration:none;}
     }
     .feature-card {
         padding: 1.5rem;
+    }
+    
+    /* Ensure hero content is fully visible on small screens */
+    .hero {
+        padding-top: calc(var(--pad)*2);
     }
 }
 </style>
@@ -273,7 +305,8 @@ toggle.addEventListener('click', function() {
 
 // Close menu when a link is clicked
 navLinks.forEach(link => {
-    link.addEventListener('click', function() {
+    link.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent default anchor behavior
         navList.classList.remove('open');
         
         // Small delay before scrolling to section for better UX
@@ -281,7 +314,14 @@ navLinks.forEach(link => {
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
-                targetElement.scrollIntoView({behavior: 'smooth'});
+                // Adjust scroll position to account for fixed header
+                const navHeight = document.querySelector('nav').offsetHeight;
+                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
             }
         }, 300);
     });
@@ -298,6 +338,12 @@ document.addEventListener('click', function(event) {
 // Prevent the click inside the menu from closing it
 navList.addEventListener('click', function(event) {
     event.stopPropagation();
+});
+
+// Fix for iOS safari overflow issues
+document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+window.addEventListener('resize', () => {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 });
 </script>
 </body>
