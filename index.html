@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Vectrue — Coming Soon</title>
+<title>Vectrue -- Coming Soon</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -29,14 +29,16 @@ body{
     background:var(--bg);
     color:var(--fg);
     line-height:1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 /* ----------  GLOBAL UTILS  ---------- */
 section{padding:var(--pad) calc(var(--pad)*.8);}
-.wrapper{max-width:var(--max-w);margin-inline:auto;}
+.wrapper{max-width:var(--max-w);margin-inline:auto;width: 100%;} /* Added width 100% */
 h1,h2,h3{font-weight:600;line-height:1.25;margin-bottom:.4em;}
 h1{font-size:clamp(2rem,5vw,3.4rem);}
 h2{font-size:clamp(1.4rem,3.75vw,2.2rem);}
-p{margin-bottom:1em;font-size:clamp(.95rem,2.6vw,.99rem);color:var(--muted);}
+/* Fixed paragraph text size to ensure readability on mobile */
+p{margin-bottom:1em;font-size:clamp(0.95rem, 1.5vw, 1.1rem);color:var(--muted);}
 .btn{
     display:inline-block;
     padding:.75em 1.4em;
@@ -59,9 +61,25 @@ nav a:hover{color:#fff;}
 /* ----------  MOBILE NAV  ---------- */
 .menu-toggle{display:none;background:none;border:0;color:#fff;font-size:1.6rem;}
 @media(max-width:840px){
-    nav ul{position:absolute;top:100%;left:0;right:0;background:var(--bg-alt);flex-direction:column;padding:1rem .5rem;max-height:0;overflow:hidden;transition:max-height .35s ease-in-out;}
+    nav ul{
+        position:absolute;
+        top:100%;
+        left:0;
+        right:0;
+        background:var(--bg-alt);
+        flex-direction:column;
+        padding:1rem .5rem;
+        max-height:0;
+        overflow:hidden;
+        transition:max-height .35s ease-in-out;
+        text-align: center; /* Center align nav items */
+        gap: 1rem; /* Reduce gap for mobile */
+    }
     nav ul.open{max-height:350px;}
     .menu-toggle{display:block;}
+    nav ul li {
+        padding: 0.5rem 0; /* Add padding to make tap targets larger */
+    }
 }
 /* ----------  HERO  ---------- */
 .hero{
@@ -73,7 +91,7 @@ nav a:hover{color:#fff;}
         var(--bg);
     text-align:center;
 }
-.hero p{font-size:clamp(1rem,2.7vw,1.15rem);}
+.hero p{font-size:clamp(1rem, 2vw, 1.15rem);} /* Adjusted sizing */
 .hero .btn{margin-top:1.2rem;}
 /* ----------  FEATURES  ---------- */
 .feature-card{
@@ -91,6 +109,7 @@ nav a:hover{color:#fff;}
     opacity:.35;
     mask:linear-gradient(#000 0 0),linear-gradient(#000 0 0);
     mask-composite:xor;
+    -webkit-mask-composite: xor; /* Added for Safari support */
     border-radius:inherit;
 }
 .feature-card h3{margin-bottom:.5rem;font-size:1.25rem;}
@@ -98,7 +117,8 @@ nav a:hover{color:#fff;}
 /* ----------  APPROACH  ---------- */
 .approach-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+    /* Reduced minimum width for better mobile layout */
+    grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
     gap:2rem;
 }
 .stat{
@@ -114,6 +134,19 @@ footer{
     color:var(--muted);
 }
 footer a{color:var(--primary);text-decoration:none;}
+
+/* Added responsive adjustments */
+@media (max-width: 480px) {
+    h1 {
+        font-size: clamp(1.8rem, 8vw, 2.5rem);
+    }
+    h2 {
+        font-size: clamp(1.4rem, 5vw, 1.8rem);
+    }
+    .feature-card {
+        padding: 1.5rem;
+    }
+}
 </style>
 </head>
 
@@ -125,9 +158,9 @@ footer a{color:var(--primary);text-decoration:none;}
     <div class="logo">VECTRUE</div>
     <button class="menu-toggle" aria-label="menu">&#9776;</button>
     <ul>
-      <li><a href="#features">Innovation</a></li>
-      <li><a href="#approach">Vision</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#features" class="nav-link">Innovation</a></li>
+      <li><a href="#approach" class="nav-link">Vision</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
     </ul>
   </div>
 </nav>
@@ -145,7 +178,8 @@ footer a{color:var(--primary);text-decoration:none;}
 <section id="features">
   <div class="wrapper">
     <h2>Pioneering Technology</h2>
-    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));">
+    <!-- Reduced minimum width for better mobile layout -->
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
       <div class="feature-card">
         <h3>Intelligent Valuation</h3>
         <p>Our proprietary AI engine delivers precision assessments based on comprehensive market data and advanced analytics.</p>
@@ -205,9 +239,19 @@ footer a{color:var(--primary);text-decoration:none;}
 
 <!-- ==========  JS: MOBILE MENU  ========== -->
 <script>
-const toggle=document.querySelector('.menu-toggle');
-const navList=document.querySelector('nav ul');
-toggle.addEventListener('click',()=>navList.classList.toggle('open'));
+const toggle = document.querySelector('.menu-toggle');
+const navList = document.querySelector('nav ul');
+const navLinks = document.querySelectorAll('.nav-link');
+
+// Toggle menu open/close
+toggle.addEventListener('click', () => navList.classList.toggle('open'));
+
+// Close menu when a link is clicked
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    navList.classList.remove('open');
+  });
+});
 </script>
 </body>
 </html>
